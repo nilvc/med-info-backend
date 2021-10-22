@@ -39,7 +39,7 @@ class Room(models.Model):
         room_name = self.room_name
 
 
-        members = [{ 'profile':member.short_serialize()} 
+        members = [{ 'profile':member.serialize()} 
                     for member in self.members.all()] 
         
         reports = [{ 'report':report.serialize()} 
@@ -79,8 +79,8 @@ class Room(models.Model):
 
 class Invite(models.Model):
     invite_id = models.UUIDField(primary_key = True,default = uuid.uuid4,editable = False)
-    invite_for = models.OneToOneField(Profile , on_delete=models.CASCADE)
-    room = models.OneToOneField(Room , on_delete=models.CASCADE)
+    invite_for = models.ForeignKey(Profile , on_delete=models.CASCADE)
+    room = models.ForeignKey(Room , on_delete=models.CASCADE)
 
     def serialize(self):
         return{

@@ -27,7 +27,6 @@ SECRET_KEY = '=4x^!lam-%rmkuko4pifcb6*-gw+s%b#v0-%lqw7@p&2yti1w%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -62,6 +61,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
@@ -138,5 +138,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = "media"
+MEDIA_ROOT = os.path.join(BASE_DIR , "media")
 MEDIA_URL = '/media/'
