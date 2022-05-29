@@ -80,10 +80,10 @@ def get_myrooms(request,email):
         member = Profile.objects.get(user__email = email)
         rooms = Room.objects.filter(members = member )
         if len(rooms)==0:
-            return JsonResponse({"Rooms":[]},status=201)
+            return JsonResponse({"Rooms":[]},status=200)
         else:
             rooms = [{"room":room.short_serialize()} for room in rooms]
-            return JsonResponse({"Rooms":rooms},status=201)
+            return JsonResponse({"Rooms":rooms},status=200)
     except:
         return HttpResponseBadRequest("Some error occured")
     
