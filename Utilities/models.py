@@ -3,9 +3,24 @@ import uuid
 from accounts.models import Profile
 from medbackend.settings import BASE_DIR, MEDIA_ROOT
 from django.core.files.storage import FileSystemStorage
+import pyrebase
 
+firebaseConfig = {
+  "apiKey": "AIzaSyATmGfiLkh8KAFGeUJnLsRpyqn7W66N2ns",
+  "authDomain": "med-info-c0e1c.firebaseapp.com",
+  "projectId": "med-info-c0e1c",
+  "storageBucket": "med-info-c0e1c.appspot.com",
+  "messagingSenderId": "1048853744839",
+  "appId": "1:1048853744839:web:35d4bbbff66d6edcf882e2",
+  "measurementId": "G-8VVEMKW7WL",
+  "databaseURL" : ""
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+storage = firebase.storage()
 
 # Create your models here.
+
 
 class Report(models.Model):
     title = models.CharField(max_length=255)
@@ -31,6 +46,9 @@ class Report(models.Model):
         }
     
     def delete(self ,*args, **kwargs):
+        # print("called delete")
+        # print(self.file)
+        # storage.child().delete(self.file)
         path = str(BASE_DIR) +str(self.file)
         fs=FileSystemStorage()
         path = path.replace("/","\\")

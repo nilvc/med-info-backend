@@ -7,6 +7,8 @@ from knox.models import AuthToken
 from knox.auth import TokenAuthentication
 from rest_framework.decorators import api_view
 import json
+import pyrebase
+from django.core.files.storage import default_storage
 
 
 
@@ -14,6 +16,20 @@ from .models import Invite, Room
 from Utilities.models import Report
 from accounts.models import Profile
 
+
+firebaseConfig = {
+  "apiKey": "AIzaSyATmGfiLkh8KAFGeUJnLsRpyqn7W66N2ns",
+  "authDomain": "med-info-c0e1c.firebaseapp.com",
+  "projectId": "med-info-c0e1c",
+  "storageBucket": "med-info-c0e1c.appspot.com",
+  "messagingSenderId": "1048853744839",
+  "appId": "1:1048853744839:web:35d4bbbff66d6edcf882e2",
+  "measurementId": "G-8VVEMKW7WL",
+  "databaseURL" : ""
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+storage = firebase.storage()
 # Create your views here.
 
 def isauth(request):
@@ -128,6 +144,7 @@ def get_searched_room(request,room_id):
 
 ## report handling in room
 
+
 @api_view(["POST"])
 def upload_report(request):
     try:
@@ -135,26 +152,28 @@ def upload_report(request):
         if not username:
             return HttpResponseBadRequest("Not authorized")
         user = Profile.objects.get(user__username = username)
-        file = request.FILES['report']
-        fs = FileSystemStorage()
-        filename = fs.save(file.name,file)
-        file = fs.url(filename)
-        
-        report = Report.objects.create(
-            title = request.POST.get("title"),
-            file = file,
-            description = request.POST.get("description"),
-            uploaded_by = user
-        )
-        report.save()
         room_id = request.POST.get("room_id")
         room = Room.objects.get(pk=room_id)
-        room.reports.add(report)
-        room.save()
-        return JsonResponse({"Report":report.serialize()} , status = 201)
+        if user in room.members.all():
+            file = request.FILES['report']
+            fs = FileSystemStorage()
+            filename = fs.save(file.name,file)
+            file = fs.url(filename)
+            
+            report = Report.objects.create(
+                title = request.POST.get("title"),
+                file = file,
+                description = request.POST.get("description"),
+                uploaded_by = user
+            )
+            report.save()
+            room.reports.add(report)
+            room.save()
+            return JsonResponse({"Report":report.serialize()} , status = 201)
+        else:
+            return HttpResponseBadRequest("User not part of the room")
     except:
         return HttpResponseBadRequest("Error occured while uploading report")
-
 
 #adding only one member for now
 @api_view(["POST"])
